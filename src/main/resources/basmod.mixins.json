@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "com.vsdguzman.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"arrowbounceMixin",
+		"arrowtntmixin",
+		"TNTEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
