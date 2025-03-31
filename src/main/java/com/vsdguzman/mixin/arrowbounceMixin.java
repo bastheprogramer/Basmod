@@ -4,6 +4,7 @@ import com.vsdguzman.Basmod;
 import com.vsdguzman.gamerules.CustomGameRules;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 
 import net.minecraft.util.math.Vec3d;
@@ -38,14 +39,13 @@ public abstract class arrowbounceMixin {
         // Get the arrow's current velocity.
         Vec3d velocity = arrow.getVelocity();
         Vec3d reflected;
-        double speed = Math.pow(velocity.squaredDistanceTo(arrow.getPos()),0.5);
+        double speed = Math.pow(velocity.squaredDistanceTo(0,0,0),0.5);
 
-        if (speed < 1.5){
+        if (speed < 0.25){
             return;
         }
 
         // Reflect velocity based on the block face hit.
-        Basmod.LOGGER.info(blockHit.getSide().asString());
         switch (blockHit.getSide()) {
             case UP:
             case DOWN:
@@ -75,6 +75,8 @@ public abstract class arrowbounceMixin {
                 arrow.getY() + reflected.y * 0.1,
                 arrow.getZ() + reflected.z * 0.1
         );
+        // Play sound
+        arrow.playSound(SoundEvents.BLOCK_SLIME_BLOCK_BREAK, 2f, 1f);
 
         // Cancel the default behavior.
         ci.cancel();

@@ -5,16 +5,16 @@ import net.fabricmc.fabric.api.gamerule.v1.CustomGameRuleCategory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameRules.BooleanRule;
-import net.minecraft.world.GameRules.Category;
 
 public class CustomGameRules {
 
     private static final CustomGameRuleCategory TNT = new CustomGameRuleCategory(
             Identifier.of(Basmod.MOD_ID, "tnt"),
-            Text.literal("TNT") // Display name for the category
+            Text.literal("TNT").formatted(Formatting.YELLOW,Formatting.BOLD) // Display name for the category
     );
 
     // Registers a gamerule "tntdups" under the EXPLOSION category with a default value of false.
