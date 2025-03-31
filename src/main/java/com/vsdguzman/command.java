@@ -1,24 +1,19 @@
 package com.vsdguzman;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.LootCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.util.Arrays;
-import java.util.List;
+
 
 public class command implements ModInitializer {
 
@@ -154,7 +149,15 @@ public class command implements ModInitializer {
                 }
                 break;
                 }
-
+            case "OrbitalVersion": {
+                for (int i = 1; i < size+1; i++) {
+                    TNTSpawner.spawnTntRing(world,center,i*0.01,i*16, 80);
+                }
+                for (int i = 1; i < 75; i++) {
+                    TNTSpawner.spawnTnt(world,center,40);
+                }
+                break;
+            }
             case "Normal":
             default: {
                 TNTSpawner.spawnTnt(world, center, 80);
