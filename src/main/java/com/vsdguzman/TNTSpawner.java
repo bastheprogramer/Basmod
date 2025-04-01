@@ -39,7 +39,7 @@ public class TNTSpawner {
         spawnTnt(world, center, 80);
 
         // Total number of TNT based on radius.
-        int totalCount = (int) (radius * 4);
+        int totalCount = (int) (4 * radius * (radius+1));
 
         for (int i = 1; i < totalCount; i++) {
             double xoffset = 0;
