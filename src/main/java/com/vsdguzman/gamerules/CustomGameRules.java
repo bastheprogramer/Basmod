@@ -29,6 +29,9 @@ public class CustomGameRules {
     public static final GameRules.Key<BooleanRule> Boucing_Arrows =
             GameRuleRegistry.register("BoucingArrows",TNT, GameRuleFactory.createBooleanRule(false));
 
+    public static final GameRules.Key<BooleanRule> Relistic_tnt =
+            GameRuleRegistry.register("Relistictnt",TNT, GameRuleFactory.createBooleanRule(false));
+
     public static void register() {
         // This method can be called from your mod's initialization code if needed.
     }
