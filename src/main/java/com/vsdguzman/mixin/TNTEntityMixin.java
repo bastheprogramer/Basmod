@@ -98,16 +98,6 @@ public abstract class TNTEntityMixin {
                 entity.addVelocity(direction.x * appliedForce, direction.y * appliedForce, direction.z * appliedForce);
             }
 
-            // Play enhanced explosion sound
-            // tnt.playSound(SoundEvents.ENTITY_TNT_PRIMED, 4.0F, 1.0F);
-
-            // Spawn enhanced particle effects to simulate debris and a shockwave
-            for (int i = 0; i < 200; i++) {
-                double offsetX = (world.random.nextDouble() - 0.5) * explosionRadius;
-                double offsetY = (world.random.nextDouble() - 0.5) * explosionRadius;
-                double offsetZ = (world.random.nextDouble() - 0.5) * explosionRadius;
-                world.addParticle(ParticleTypes.EXPLOSION, tnt.getX(), tnt.getY(), tnt.getZ(), offsetX, offsetY, offsetZ);
-            }
 
             // Call the parent explosion logic if desired (or fully override it)
             //super.explode();
