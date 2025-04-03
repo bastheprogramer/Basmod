@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,16 +26,20 @@ import java.util.List;
 @Mixin(TntEntity.class)
 public abstract class TNTEntityMixin {
 
-
     @Inject(method = "explode", at = @At("HEAD"), cancellable = true)
     private void onExplode(CallbackInfo ci) {
         TntEntity tnt = (TntEntity)(Object)this;
         MinecraftServer server = tnt.getServer();
-        Vec3d tntPos = tnt.getPos().add(0,1,0);
+        // Adjust TNT position by adding 1 to Y as before (for TNT duplication)
+        Vec3d tntPos = tnt.getPos().add(0, 1, 0);
         World world = tnt.getWorld();
-        if(server.getGameRules().getBoolean(CustomGameRules.Relistic_tnt)) {
-            Vec3d explosionCenter = tnt.getPos();
-            float explosionRadius = 6.0F; // Adjust to your desired range
+        if (server.getGameRules().getBoolean(GameRules.TNT_EXPLODES)){
+            return;
+        }
+        if (server.getGameRules().getBoolean(CustomGameRules.Relistic_tnt)) {
+            // Compute explosion center with the correct Y offset using getBodyY(0.0625D)
+            Vec3d explosionCenter = new Vec3d(tnt.getX(), tnt.getBodyY(0.0625D), tnt.getZ());
+            float explosionRadius = 4.0F; // Adjust to your desired range
 
             // Container for blocks that will be affected by the explosion
             List<BlockPos> affectedBlocks = new ArrayList<>();
@@ -80,12 +85,18 @@ public abstract class TNTEntityMixin {
                 fallingBlock.setVelocity(velocity.x, velocity.y, velocity.z);
             }
 
-
             // Apply directional knockback to nearby entities
             List<Entity> nearbyEntities = world.getEntitiesByClass(Entity.class,
-                    new Box(explosionCenter.x - explosionRadius, explosionCenter.y - explosionRadius, explosionCenter.z - explosionRadius,
-                            explosionCenter.x + explosionRadius, explosionCenter.y + explosionRadius, explosionCenter.z + explosionRadius),
-                    entity -> entity != tnt);
+                    new Box(
+                            explosionCenter.x - explosionRadius,
+                            explosionCenter.y - explosionRadius,
+                            explosionCenter.z - explosionRadius,
+                            explosionCenter.x + explosionRadius,
+                            explosionCenter.y + explosionRadius,
+                            explosionCenter.z + explosionRadius
+                    ),
+                    entity -> entity != tnt
+            );
             for (Entity entity : nearbyEntities) {
                 Vec3d direction = entity.getPos().subtract(explosionCenter).normalize();
                 double distance = Math.max(entity.getPos().distanceTo(explosionCenter), 0.1);
@@ -98,10 +109,10 @@ public abstract class TNTEntityMixin {
                 entity.addVelocity(direction.x * appliedForce, direction.y * appliedForce, direction.z * appliedForce);
             }
 
-
-            // Call the parent explosion logic if desired (or fully override it)
-            //super.explode();
+            // Optionally, you can call the parent explosion logic if desired:
+            // super.explode();
         }
+
         int tntdupnumber = server.getGameRules().getInt(CustomGameRules.TNTDUPS);
         if (tntdupnumber != 0) {
             // Use the shadowed 'level' field to pass the world to TNTSpawner.spawnTntRing
