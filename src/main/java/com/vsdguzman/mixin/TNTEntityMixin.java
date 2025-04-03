@@ -33,7 +33,7 @@ public abstract class TNTEntityMixin {
         // Adjust TNT position by adding 1 to Y as before (for TNT duplication)
         Vec3d tntPos = tnt.getPos().add(0, 1, 0);
         World world = tnt.getWorld();
-        if (server.getGameRules().getBoolean(GameRules.TNT_EXPLODES)){
+        if (!server.getGameRules().getBoolean(GameRules.TNT_EXPLODES)){
             return;
         }
         if (server.getGameRules().getBoolean(CustomGameRules.Relistic_tnt)) {
