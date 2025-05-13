@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.Vec3ArgumentType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -25,15 +26,11 @@ public class command implements ModInitializer {
 
     public static void registerCommands() {
         // Register the command using Fabric's v2 command registration callback.
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> {
-            registerNukeCommand(dispatcher);
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> registerNukeCommand(dispatcher));
         Basmod.LOGGER.info("nuke command registered");
 
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> {
-            registerStabCommand(dispatcher);
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> registerStabCommand(dispatcher));
         Basmod.LOGGER.info("stab command registered");
     }
 
@@ -49,8 +46,11 @@ public class command implements ModInitializer {
                                     int depth = IntegerArgumentType.getInteger(context, "depth");
                                     ServerCommandSource source = context.getSource();
                                     World world = source.getWorld();
-                                    BlockPos playerpos = source.getPlayer().getBlockPos().up();
-                                    Vec3d spawnPos = new Vec3d(playerpos.getZ(), playerpos.getY(), playerpos.getZ());
+                                    PlayerEntity Player = source.getPlayer();
+
+                                    assert Player != null;
+                                    Vec3d spawnPos = Player.getPos();
+
                                     TNTSpawner.stabTNT(world, spawnPos, depth);
                                     source.getServer().getPlayerManager().getPlayerList().forEach(p ->
                                             p.sendMessage(Text.literal("boom"), false)
@@ -63,6 +63,7 @@ public class command implements ModInitializer {
                                             int depth = IntegerArgumentType.getInteger(context, "depth");
                                             ServerCommandSource source = context.getSource();
                                             World world = source.getWorld();
+
                                             // Retrieve the Vec3d position from the command context.
                                             Vec3d spawnPos = Vec3ArgumentType.getVec3(context, "position").add(0, 1, 0);
                                             TNTSpawner.stabTNT(world, spawnPos, depth);
@@ -151,7 +152,7 @@ public class command implements ModInitializer {
                 }
             case "OrbitalVersion": {
                 for (int i = 1; i < size+1; i++) {
-                    TNTSpawner.spawnTntRing(world,center,i*0.01,i*16, 80);
+                    TNTSpawner.spawnTntRing(world,center,i*0.01,i*16, 80+i);
                 }
                 for (int i = 1; i < 75; i++) {
                     TNTSpawner.spawnTnt(world,center,40);
