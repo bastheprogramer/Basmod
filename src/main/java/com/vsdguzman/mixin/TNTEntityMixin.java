@@ -36,7 +36,7 @@ public abstract class TNTEntityMixin {
         if (!server.getGameRules().getBoolean(GameRules.TNT_EXPLODES)){
             return;
         }
-        if (server.getGameRules().getBoolean(CustomGameRules.Relistic_tnt)) {
+        if (server.getGameRules().getBoolean(CustomGameRules.Realistic_tnt)) {
             // Compute explosion center with the correct Y offset using getBodyY(0.0625D)
             Vec3d explosionCenter = new Vec3d(tnt.getX(), tnt.getBodyY(0.0625D), tnt.getZ());
             float explosionRadius = 4.0F; // Adjust to your desired range

@@ -29,7 +29,6 @@ public class command implements ModInitializer {
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> registerNukeCommand(dispatcher));
         Basmod.LOGGER.info("nuke command registered");
 
-
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, environment) -> registerStabCommand(dispatcher));
         Basmod.LOGGER.info("stab command registered");
     }
@@ -152,10 +151,29 @@ public class command implements ModInitializer {
                 }
             case "OrbitalVersion": {
                 for (int i = 1; i < size+1; i++) {
-                    TNTSpawner.spawnTntRing(world,center,i*0.01,i*16, 80+i);
+                    TNTSpawner.spawnTntRing(world,center,0.02,i*16, 40+i);
+                    TNTSpawner.spawnTnt(world,center,22);
+
+                }
+                for (int i = 1; i < 75; i++) {
+                    TNTSpawner.spawnTnt(world,center,20);
+                }
+                break;
+            }
+            case "BunkerBuster":{
+                for (int i = 1; i < size+1; i++) {
+                    TNTSpawner.spawnTntRing(world,center,0.01,i*16, 80+i);
+                    make8tnt(world,center,41);
                 }
                 for (int i = 1; i < 75; i++) {
                     TNTSpawner.spawnTnt(world,center,40);
+                }
+                break;
+            }
+            case "TunnelDigger":{
+                for (int i = (int) size; i > 0; i--) {
+                    TNTSpawner.spawnTntRing(world, center, 0.01, i * 16, 20);
+                    make8tnt(world, center, 19);
                 }
                 break;
             }
@@ -168,8 +186,7 @@ public class command implements ModInitializer {
                 break;
             }
         }
-        source.getServer().getPlayerManager().getPlayerList().forEach(p ->
-                p.sendMessage(Text.literal("boom"), false));
+
         return;
     }
 }
