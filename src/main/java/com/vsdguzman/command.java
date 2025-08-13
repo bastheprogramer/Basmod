@@ -7,6 +7,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -14,6 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 
 public class command implements ModInitializer {
@@ -51,9 +55,6 @@ public class command implements ModInitializer {
                                     Vec3d spawnPos = Player.getPos();
 
                                     TNTSpawner.stabTNT(world, spawnPos, depth);
-                                    source.getServer().getPlayerManager().getPlayerList().forEach(p ->
-                                            p.sendMessage(Text.literal("boom"), false)
-                                    );
                                     return 1;
                                 })
                                 // Optionally allow a Vec3 argument named "position" for custom spawn location.
@@ -66,9 +67,6 @@ public class command implements ModInitializer {
                                             // Retrieve the Vec3d position from the command context.
                                             Vec3d spawnPos = Vec3ArgumentType.getVec3(context, "position").add(0, 1, 0);
                                             TNTSpawner.stabTNT(world, spawnPos, depth);
-                                            source.getServer().getPlayerManager().getPlayerList().forEach(p ->
-                                                    p.sendMessage(Text.literal("boom"), false)
-                                            );
                                             return 1;
                                         })
                                 )
@@ -133,7 +131,9 @@ public class command implements ModInitializer {
         return;
     }
 
-    private static void MakeNuke(ServerCommandSource source, World world, Vec3d center, double size, String type) {
+
+    private static void MakeNuke(ServerCommandSource source, World world, Vec3d center, int size, String type) {
+        int ArrowTntCount = (int) Math.floor(75 * Math.log(size + 1));
         switch (type) {
             case "Spiral": {
                 TNTSpawner.spawnSpiralTnt(world, center, size);
@@ -142,39 +142,65 @@ public class command implements ModInitializer {
             case "Arrow": {
                 ARROWSpawner.SpawnArrow(world,center);
                 for (int i = 1; i < size+1; i++) {
-                    ARROWSpawner.spawnARROWRing(world,center,i*0.01,i*16);
+                    ARROWSpawner.spawnARROWRing(world,center,i*0.01,i*16, arrow -> {});
                 }
-                for (int i = 1; i < 75; i++) {
+                for (int i = 1; i < ArrowTntCount; i++) {
                     TNTSpawner.spawnTnt(world,center,10);
                 }
                 break;
                 }
             case "OrbitalVersion": {
-                for (int i = 1; i < size+1; i++) {
-                    TNTSpawner.spawnTntRing(world,center,0.02,i*16, 40+i);
-                    TNTSpawner.spawnTnt(world,center,22);
+                for (int i = size+1; i >= 1; i--) {
+
+                    TNTSpawner.spawnTntRing(world,center,0.002,i*16, 30+i);
+                    TNTSpawner.spawnTnt(world,center,21);
+
 
                 }
-                for (int i = 1; i < 75; i++) {
+                TNTSpawner.spawnTnt(world,center,30);
+                for (int i = 1; i < 25; i++) {
                     TNTSpawner.spawnTnt(world,center,20);
                 }
                 break;
             }
             case "BunkerBuster":{
                 for (int i = 1; i < size+1; i++) {
-                    TNTSpawner.spawnTntRing(world,center,0.01,i*16, 80+i);
+                    TNTSpawner.spawnTntRing(world,center,0.0001,i*32, 80+i);
                     make8tnt(world,center,41);
                 }
                 for (int i = 1; i < 75; i++) {
                     TNTSpawner.spawnTnt(world,center,40);
                 }
+                for (int x = 0; x < 8; x++) {
+                    TNTSpawner.spawnTnt(world, center, x+32);
+                }
                 break;
             }
             case "TunnelDigger":{
-                for (int i = (int) size; i > 0; i--) {
+                for (int i = size; i > 0; i--) {
                     TNTSpawner.spawnTntRing(world, center, 0.01, i * 16, 20);
                     make8tnt(world, center, 19);
                 }
+                break;
+            }
+            case "RailGun":{
+
+                double offset =  0.0625;
+
+                ARROWSpawner.spawnARROWRing(world,center.subtract(0,offset,0),0.5, (int) (size*(Math.floor(size/3.5)+1)*16), arrow -> {
+                    try {
+                        Method setPierceLevel = PersistentProjectileEntity.class.getDeclaredMethod("setPierceLevel", byte.class);
+                        setPierceLevel.setAccessible(true);
+                        setPierceLevel.invoke(arrow, (byte) 15);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                        });
+                for (int i = 1; i < ArrowTntCount + new int[]{2, 1, 0}[ArrowTntCount % 3]; i++) {
+                    TNTSpawner.spawnTnt(world,center.add(0,0.0625D,0),1).setNoGravity(true);
+                }
+
+
                 break;
             }
             case "Normal":

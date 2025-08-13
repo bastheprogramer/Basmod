@@ -21,6 +21,7 @@ public class SuggestionsProvider implements SuggestionProvider<ServerCommandSour
         builder.suggest("OrbitalVersion");
         builder.suggest("BunkerBuster");
         builder.suggest("TunnelDigger");
+        builder.suggest("RailGun");
         // Return the built suggestions.
         return builder.buildFuture();
     }

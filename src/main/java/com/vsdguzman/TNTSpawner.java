@@ -7,6 +7,7 @@ import net.minecraft.server.world.ServerWorld;
 
 public class TNTSpawner {
 
+
     /**
      * Spawns a ring of TNT entities around the given center position.
      *
@@ -85,21 +86,25 @@ public class TNTSpawner {
      * @param pos   The position where the TNT will be spawned.
      * @param fuse  The fuse value (in ticks) for the TNT.
      */
-    public static void spawnTnt(World world, Vec3d pos, int fuse) {
+    public static TntEntity spawnTnt(World world, Vec3d pos, int fuse) throws IllegalArgumentException{
         // Ensure that we are running on the server side.
         if (!(world instanceof ServerWorld)) {
-            return;
+            throw new IllegalArgumentException("World must be an instance of ServerWorld.");
         }
-        ServerWorld serverWorld = (ServerWorld) world;
-        // Use the spawn method with a SpawnReason.
 
-        TntEntity tnt = new TntEntity(world, pos.getX(), pos.getY(), pos.getZ(),null);
-        if (tnt != null) {
-            tnt.refreshPositionAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
-            Vec3d vel = tnt.getVelocity();
-            tnt.addVelocity(-vel.getX(),-vel.getY(),-vel.getZ());
-            tnt.setFuse(fuse);
-            serverWorld.spawnEntity(tnt);
-        }
+        ServerWorld serverWorld = (ServerWorld) world;
+
+        // Create the TNT entity at the specified position without an igniter.
+        TntEntity tnt = new TntEntity(serverWorld, pos.getX(), pos.getY(), pos.getZ(), null);
+
+        // Initialize its position and velocity.
+        tnt.refreshPositionAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0.0F, 0.0F);
+        tnt.setVelocity(0, 0, 0);
+        tnt.setFuse(fuse);
+
+        // Spawn the entity in the server world.
+        serverWorld.spawnEntity(tnt);
+
+        return tnt;
     }
 }

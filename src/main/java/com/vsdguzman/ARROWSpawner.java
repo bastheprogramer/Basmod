@@ -7,42 +7,32 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.function.Consumer;
+
 public class ARROWSpawner {
-    public static void SpawnArrow(World world, Vec3d pos) {
-        // Ensure that we are running on the server side.
-        if (!(world instanceof ServerWorld)) {
-            return;
-        }
-        ServerWorld serverWorld = (ServerWorld) world;
+    public static ArrowEntity SpawnArrow(World world, Vec3d pos) {
+        if (!(world instanceof ServerWorld serverWorld)) return null;
 
-        // Create a new arrow entity at the specified position using the serverWorld.
         ArrowEntity arrow = EntityType.ARROW.create(serverWorld, SpawnReason.COMMAND);
-        if (arrow == null) {
-            return;
-        }
-        // Set the arrow's position and angles.
-        arrow.setPos(pos.getX(),pos.getY(),pos.getZ());
-
-        // Optionally modify the arrow's velocity (here, we simply neutralize it).
-        Vec3d vel = arrow.getVelocity();
-        arrow.addVelocity(-vel.getX(), -vel.getY(), -vel.getZ());
-
-        // Spawn the arrow entity in the world.
+        arrow.setVelocity(0, 0, 0);
+        arrow.setPosition(pos);
         serverWorld.spawnEntity(arrow);
+
+        return arrow;
     }
 
-    public static void spawnARROWRing(World world, Vec3d center, double radius, int count) {
+    public static void spawnARROWRing(World world, Vec3d center, double radius, int count, Consumer<ArrowEntity> arrowModifier) {
         double angleIncrement = 2 * Math.PI / count;
         for (int i = 0; i < count; i++) {
             double angle = i * angleIncrement;
             double offsetX = radius * Math.cos(angle);
             double offsetZ = radius * Math.sin(angle);
-            double x = center.getX() + offsetX;
-            double y = center.getY();
-            double z = center.getZ() + offsetZ;
+            Vec3d pos = center.add(offsetX, 0, offsetZ);
 
-            Vec3d pos = new Vec3d(x, y, z);
-            SpawnArrow(world, pos);
+            ArrowEntity arrow = SpawnArrow(world, pos);
+            if (arrow != null) {
+                arrowModifier.accept(arrow); // Apply user-defined logic
+            }
         }
     }
 }

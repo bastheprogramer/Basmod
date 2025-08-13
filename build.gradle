@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -26,20 +26,23 @@ fabricApi {
 
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft "net.minecraft:minecraft:${project.minecraft_version}"
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+
 }
 
 processResources {
-	inputs.property "version", project.version
+	// Store in a plain variable so the closure is configuration-cache safe
+	def modVersion = project.version
+
+	inputs.property("version", modVersion)
 
 	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+		expand(["version": modVersion])
 	}
 }
 
@@ -58,13 +61,16 @@ java {
 }
 
 jar {
-	inputs.property "archivesName", project.base.archivesName
+	// Get a plain value instead of Gradle object
+	def archiveName = base.archivesName.get()
+
+	// Still register the property for cache tracking
+	inputs.property("archivesName", archiveName)
 
 	from("LICENSE") {
-		rename { "${it}_${inputs.properties.archivesName}"}
+		rename { "${it}_${archiveName}" }
 	}
 }
-
 // configure the maven publication
 publishing {
 	publications {

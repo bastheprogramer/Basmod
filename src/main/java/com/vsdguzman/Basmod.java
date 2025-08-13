@@ -20,5 +20,6 @@ public class Basmod implements ModInitializer {
 		// Proceed with mild caution.
 		command.registerCommands();
 		new CustomGameRules();
+
 	}
 }
