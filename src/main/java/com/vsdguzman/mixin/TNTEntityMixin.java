@@ -6,7 +6,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.TntEntity;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -29,10 +28,10 @@ public abstract class TNTEntityMixin {
     @Inject(method = "explode", at = @At("HEAD"), cancellable = true)
     private void onExplode(CallbackInfo ci) {
         TntEntity tnt = (TntEntity)(Object)this;
-        MinecraftServer server = tnt.getServer();
+        MinecraftServer server = tnt.getEntityWorld().getServer();
         // Adjust TNT position by adding 1 to Y as before (for TNT duplication)
-        Vec3d tntPos = tnt.getPos().add(0, 1, 0);
-        World world = tnt.getWorld();
+        Vec3d tntPos = tnt.getEntityPos().add(0, 1, 0);
+        World world = tnt.getEntityWorld();
         if (!server.getGameRules().getBoolean(GameRules.TNT_EXPLODES)){
             return;
         }
@@ -98,8 +97,8 @@ public abstract class TNTEntityMixin {
                     entity -> entity != tnt
             );
             for (Entity entity : nearbyEntities) {
-                Vec3d direction = entity.getPos().subtract(explosionCenter).normalize();
-                double distance = Math.max(entity.getPos().distanceTo(explosionCenter), 0.1);
+                Vec3d direction = entity.getEntityPos().subtract(explosionCenter).normalize();
+                double distance = Math.max(entity.getEntityPos().distanceTo(explosionCenter), 0.1);
                 // Calculate force using an inverse relation to distance (tweak as needed)
                 double appliedForce = 4.0 * (1.0 / distance);
                 if (entity instanceof FallingBlockEntity) {

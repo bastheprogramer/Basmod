@@ -52,7 +52,7 @@ public class command implements ModInitializer {
                                     PlayerEntity Player = source.getPlayer();
 
                                     assert Player != null;
-                                    Vec3d spawnPos = Player.getPos();
+                                    Vec3d spawnPos = Player.getEntityPos();
 
                                     TNTSpawner.stabTNT(world, spawnPos, depth);
                                     return 1;
@@ -94,11 +94,8 @@ public class command implements ModInitializer {
                                                     ServerCommandSource source = context.getSource();
                                                     World world = source.getWorld();
                                                     Vec3d spawnPos = posProvided.add(0, 1, 0);
-                                                    try {
-                                                        NukeMaker.MakeNuke(source,world,spawnPos,size,type);
-                                                    } catch (NoSuchMethodException e) {
-                                                        e.printStackTrace();
-                                                    }
+
+                                                    NukeMaker.MakeNuke(source,world,spawnPos,size,type);
                                                     return 1;
                                                 })
                                         )
@@ -109,11 +106,7 @@ public class command implements ModInitializer {
                                             ServerCommandSource source = context.getSource();
                                             World world = source.getWorld();
                                             Vec3d spawnPos = posProvided.add(0, 1, 0);
-                                            try {
-                                                NukeMaker.MakeNuke(source, world, spawnPos, size, "");
-                                            } catch (NoSuchMethodException e) {
-                                                e.printStackTrace();
-                                            }
+                                            NukeMaker.MakeNuke(source, world, spawnPos, size, "");
                                             return 1;
                                         })
                                 )
@@ -125,11 +118,7 @@ public class command implements ModInitializer {
                                     BlockPos playerpos = source.getPlayer().getBlockPos().up();
                                     Vec3d spawnPos = new Vec3d(playerpos.getX(), playerpos.getY(), playerpos.getZ());
 
-                                    try {
-                                        NukeMaker.MakeNuke(source, world, spawnPos, size, "");
-                                    } catch (NoSuchMethodException e) {
-                                        e.printStackTrace();
-                                    }
+                                    NukeMaker.MakeNuke(source, world, spawnPos, size, "");
                                     return 1;
                                 })
                         )

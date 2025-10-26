@@ -30,7 +30,7 @@ public abstract class arrowtntmixin {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void onTick(CallbackInfo ci) {
         ArrowEntity arrow = (ArrowEntity) (Object) this;
-        World world = arrow.getWorld();
+        World world = arrow.getEntityWorld();
         // Only run on the server side and for players with permission level 2+
         if (world.isClient() || !(arrow.getOwner() instanceof ServerPlayerEntity serverPlayer
                 && serverPlayer.getPermissionLevel() >= 2)) {
@@ -46,7 +46,7 @@ public abstract class arrowtntmixin {
                 return;
             }
             int fuseTime = Math.max(1, 80 - arrow.age);
-            TNTSpawner.spawnTnt(world, arrow.getPos(), fuseTime);
+            TNTSpawner.spawnTnt(world, arrow.getEntityPos(), fuseTime);
         }
     }
 }

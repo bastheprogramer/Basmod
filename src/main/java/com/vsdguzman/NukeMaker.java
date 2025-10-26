@@ -1,5 +1,6 @@
 package com.vsdguzman;
 
+import com.vsdguzman.mixin.arrowAccessorMixin;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.Vec3d;
@@ -9,7 +10,7 @@ import java.lang.reflect.Method;
 
 public class NukeMaker {
 
-    public static void MakeNuke(ServerCommandSource source, World world, Vec3d center, int size, String type) throws NoSuchMethodException {
+    public static void MakeNuke(ServerCommandSource source, World world, Vec3d center, int size, String type) {
         int ArrowTntCount = (int) Math.floor(75 * Math.log(size + 1));
 
         switch (type) {
@@ -61,23 +62,10 @@ public class NukeMaker {
             }
             case "RailGun": {
                 double offset = 0.0625;
-                Method setPierceLevel = null;
-                try {
-                    setPierceLevel = PersistentProjectileEntity.class.getDeclaredMethod("setPierceLevel", byte.class);
-                    setPierceLevel.setAccessible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Method finalSetPierceLevel = setPierceLevel;
                 ARROWSpawner.spawnARROWRing(world, center.subtract(0, offset, 0), 0.5,
                         (int) (size * (Math.floor(size / 3.5) + 1) * 16),
-                        arrow -> {
-                            try {
-                                finalSetPierceLevel.invoke(arrow, (byte) 127);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
+                        arrow -> ((arrowAccessorMixin) arrow).invokeSetPierceLevel((byte) 127)
+                );
                 for (int i = 1; i < ArrowTntCount + new int[]{0, 2, 1}[ArrowTntCount % 3]; i++) {
                     TNTSpawner.spawnTnt(world, center.add(0, 0.0625D, 0), 1).setNoGravity(true);
                 }

@@ -5,7 +5,8 @@
 	"mixins": [
 		"arrowbounceMixin",
 		"arrowtntmixin",
-		"TNTEntityMixin"
+		"TNTEntityMixin",
+		"arrowAccessorMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -20,7 +20,7 @@ public abstract class arrowbounceMixin {
         // Check if this instance is actually an ArrowEntity
         PersistentProjectileEntity projectile = (PersistentProjectileEntity) (Object) this;
 
-        if (projectile.getWorld().isClient()){
+        if (projectile.getEntityWorld().isClient()){
             return;
         }
 
@@ -32,7 +32,7 @@ public abstract class arrowbounceMixin {
         ArrowEntity arrow = (ArrowEntity) (Object) this;
 
         // Check your custom gamerule.
-        if (!arrow.getWorld().getServer().getGameRules().getBoolean(CustomGameRules.Boucing_Arrows)) {
+        if (!arrow.getEntityWorld().getServer().getGameRules().getBoolean(CustomGameRules.Boucing_Arrows)) {
             return;
         }
 
