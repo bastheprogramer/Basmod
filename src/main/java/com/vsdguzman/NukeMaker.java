@@ -1,12 +1,9 @@
 package com.vsdguzman;
 
 import com.vsdguzman.mixin.arrowAccessorMixin;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import java.lang.reflect.Method;
 
 public class NukeMaker {
 
@@ -21,7 +18,9 @@ public class NukeMaker {
             case "Arrow": {
                 ARROWSpawner.SpawnArrow(world, center);
                 for (int i = 1; i < size + 1; i++) {
-                    ARROWSpawner.spawnARROWRing(world, center, i * 0.01, i * 16, arrow -> {});
+                    ARROWSpawner.spawnARROWRing(world, center, i * 0.01, i * 16, arrow ->
+                            ((arrowAccessorMixin) arrow).invokeSetPierceLevel((byte) 127)
+                    );
                 }
                 for (int i = 1; i < ArrowTntCount; i++) {
                     TNTSpawner.spawnTnt(world, center, 10);
